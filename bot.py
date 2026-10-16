@@ -248,6 +248,9 @@ class Cleaner(commands.Bot):
         if guild is None:
             return
         author = job['author_id']
+        if (job['mode'] == 'automatic' and datetime.now(ZoneInfo('America/New_York')).hour != 13):
+            await self.store.retry(guild.id, author, next_daily_cleanup(), job['job_key'])
+            return
         if author in self.config.protected or (
                 job['mode'] == 'automatic' and not self.config.auto_cleanup):
             await self.store.cancel(guild.id, author, job_key=job['job_key'])
